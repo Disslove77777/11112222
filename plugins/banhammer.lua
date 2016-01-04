@@ -392,7 +392,7 @@ do
         "!sb <user_id>/@<username> : ub user_id/username globally."
       },
       moderator = {
-        "!an kick : Enable flood protection. Flooder will be kicked.",
+        "!an kick : Enable flood protection . Flooder will be kicked.",
         "!an b : Enable flood protection. Flooder will be bned.",
         "!an disable : Disable flood protection",
         "!b : If type in reply, will b user from chat group.",
