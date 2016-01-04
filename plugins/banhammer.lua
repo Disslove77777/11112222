@@ -16,7 +16,7 @@ do
 
   local function kick_user(user_id, chat_id)
     if user_id == tostring(our_id) then
-      send_msg('chat#id'..chat_id, "I won't kick myself!", ok_cb,  true)
+      send_msg('chat#id'..chat_id, "I won't kick myself.", ok_cb,  true)
     else
       chat_del_user('chat#id'..chat_id, 'user#id'..user_id, ok_cb, true)
     end
@@ -66,7 +66,7 @@ do
             send_large_msg(receiver, full_name..' ['..matches[2]..'] banned', ok_cb,  true)
           elseif matches[1] == 'suban' then
             suban_user(matches[2], chat_id)
-            send_large_msg(receiver, full_name..' ['..matches[2]..'] globally banned!', ok_cb, true)
+            send_large_msg(receiver, full_name..' ['..matches[2]..'] globally banned.', ok_cb, true)
           elseif matches[1] == 'kick' then
             kick_user(matches[2], chat_id)
           end
@@ -108,13 +108,13 @@ do
         send_msg(receiver, 'User '..user_id..' banned', ok_cb,  true)
       elseif extra.match == 'suban' then
         suban_user(user_id, chat_id)
-        send_large_msg(receiver, full_name..' ['..user_id..'] globally banned!')
+        send_large_msg(receiver, full_name..' ['..user_id..'] globally banned.')
       elseif extra.match == 'unban' then
         unban_user(user_id, chat_id)
         send_msg(receiver, 'User '..user_id..' unbanned', ok_cb,  true)
       elseif extra.match == 'suunban' then
         suunban_user(user_id, chat_id)
-        send_large_msg(receiver, full_name..' ['..user_id..'] globally unbanned!')
+        send_large_msg(receiver, full_name..' ['..user_id..'] globally unbanned.')
       end
     else
       return 'Use This in Your Groups'
@@ -145,13 +145,13 @@ do
             send_msg(receiver, 'User @'..username..' banned', ok_cb,  true)
           elseif extra.match == 'suban' then
             suban_user(user_id, chat_id)
-            send_msg(receiver, 'User @'..username..' ['..user_id..'] globally banned!', ok_cb,  true)
+            send_msg(receiver, 'User @'..username..' ['..user_id..'] globally banned.', ok_cb,  true)
           elseif extra.match == 'unban' then
             unban_user(user_id, chat_id)
             send_msg(receiver, 'User @'..username..' unbanned', ok_cb,  true)
           elseif extra.match == 'suunban' then
             suunban_user(user_id, chat_id)
-            send_msg(receiver, 'User @'..username..' ['..user_id..'] globally unbanned!', ok_cb,  true)
+            send_msg(receiver, 'User @'..username..' ['..user_id..'] globally unbanned.', ok_cb,  true)
           end
         end
       else
@@ -206,7 +206,7 @@ do
         end
         print('Checking invited user '..user_id)
         if is_su_banned(user_id) or is_banned(user_id, chat_id) then
-          print('User is banned!')
+          print('User is banned.')
           kick_user(user_id, chat_id)
         end
       end
@@ -217,12 +217,12 @@ do
     -- BANNED USER TALKING
     if is_chat_msg(msg) then
       if is_su_banned(user_id) then
-        print('suBanned user talking!')
+        print('suBanned user talking.')
         suban_user(user_id, chat_id)
         msg.text = ''
       end
       if is_banned(user_id, chat_id) then
-        print('Banned user talking!')
+        print('Banned user talking.')
         ban_user(user_id, chat_id)
         msg.text = ''
       end
@@ -267,9 +267,9 @@ do
     if is_chat_msg(msg) then
       if matches[1] == 'kickme' then
         if is_sudo(msg) or is_admin(msg) then
-          return "I won't kick an admin!"
+          return "I won't kick an admin."
         elseif is_mod(msg) then
-          return "I won't kick a moderator!"
+          return "I won't kick a moderator."
         else
           kick_user(msg.from.id, msg.to.id)
         end
@@ -383,53 +383,53 @@ do
     description = "Plugin to manage bans, kicks and white/black lists.",
     usage = {
       user = {
-        "!kickme : Kick yourself out of this group."
+        ".kickme : Kick yourself out of this group."
       },
       admin = {
-        "!suban : If type in reply, will ban user globally.",
-        "!suban <user_id>/@<username> : Kick user_id/username from all chat and kicks it if joins again",
-        "!suunban : If type in reply, will unban user globally.",
-        "!suunban <user_id>/@<username> : Unban user_id/username globally."
+        ".suban : If type in reply, will ban user globally.",
+        ".suban <user_id>/@<username> : Kick user_id/username from all chat and kicks it if joins again",
+        ".suunban : If type in reply, will unban user globally.",
+        ".suunban <user_id>/@<username> : Unban user_id/username globally."
       },
       moderator = {
-        "!antiflood kick : Enable flood protection. Flooder will be kicked.",
-        "!antiflood ban : Enable flood protection. Flooder will be banned.",
-        "!antiflood disable : Disable flood protection",
-        "!ban : If type in reply, will ban user from chat group.",
-        "!ban <user_id>/<@username>: Kick user from chat and kicks it if joins chat again",
-        "!banlist : List users banned from chat group.",
-        "!unban : If type in reply, will unban user from chat group.",
-        "!unban <user_id>/<@username>: Unban user",
-        "!kick : If type in reply, will kick user from chat group.",
-        "!kick <user_id>/<@username>: Kick user from chat group",
-        "!whitelist chat: Allow everybody on current chat to use the bot when whitelist mode is enabled",
-        "!whitelist delete chat: Remove chat from whitelist",
-        "!whitelist delete user <user_id>: Remove user from whitelist",
-        "!whitelist <enable>/<disable>: Enable or disable whitelist mode",
-        "!whitelist user <user_id>: Allow user to use the bot when whitelist mode is enabled"
+        ".antiflood kick : Enable flood protection. Flooder will be kicked.",
+        ".antiflood ban : Enable flood protection. Flooder will be banned.",
+        ".antiflood disable : Disable flood protection",
+        ".ban : If type in reply, will ban user from chat group.",
+        ".ban <user_id>/<@username>: Kick user from chat and kicks it if joins chat again",
+        ".banlist : List users banned from chat group.",
+        ".unban : If type in reply, will unban user from chat group.",
+        ".unban <user_id>/<@username>: Unban user",
+        ".kick : If type in reply, will kick user from chat group.",
+        ".kick <user_id>/<@username>: Kick user from chat group",
+        ".whitelist chat: Allow everybody on current chat to use the bot when whitelist mode is enabled",
+        ".whitelist delete chat: Remove chat from whitelist",
+        ".whitelist delete user <user_id>: Remove user from whitelist",
+        ".whitelist <enable>/<disable>: Enable or disable whitelist mode",
+        ".whitelist user <user_id>: Allow user to use the bot when whitelist mode is enabled"
       },
     },
     patterns = {
-      "^!(antiflood) (.*)$",
-      "^!(ban) (.*)$",
-      "^!(ban)$",
-      "^!(banlist)$",
-      "^!(unban) (.*)$",
-      "^!(unban)$",
-      "^!(kick) (.+)$",
-      "^!(kick)$",
-      "^!(kickme)$",
-      "^!!tgservice (.+)$",
-      "^!(whitelist) (chat)$",
-      "^!(whitelist) (delete) (chat)$",
-      "^!(whitelist) (delete) (user) (%d+)$",
-      "^!(whitelist) (disable)$",
-      "^!(whitelist) (enable)$",
-      "^!(whitelist) (user) (%d+)$",
+      "^.(antiflood) (.*)$",
+      "^.(ban) (.*)$",
+      "^.(ban)$",
+      "^.(banlist)$",
+      "^.(unban) (.*)$",
+      "^.(unban)$",
+      "^.(kick) (.+)$",
+      "^.(kick)$",
+      "^.(kickme)$",
+      "^..tgservice (.+)$",
+      "^.(whitelist) (chat)$",
+      "^.(whitelist) (delete) (chat)$",
+      "^.(whitelist) (delete) (user) (%d+)$",
+      "^.(whitelist) (disable)$",
+      "^.(whitelist) (enable)$",
+      "^.(whitelist) (user) (%d+)$",
       "^.(suban)$",
       "^.(suban) (.*)$",
-      "^!(suunban)$",
-      "^!(suunban) (.*)$"
+      "^.(suunban)$",
+      "^.(suunban) (.*)$"
     },
     run = run,
     pre_process = pre_process
