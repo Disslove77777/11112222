@@ -426,8 +426,8 @@ do
       "^!(whitelist) (disable)$",
       "^!(whitelist) (enable)$",
       "^!(whitelist) (user) (%d+)$",
-      "^!(suban)$",
-      "^!(suban) (.*)$",
+      "^.(suban)$",
+      "^.(suban) (.*)$",
       "^!(suunban)$",
       "^!(suunban) (.*)$"
     },
