@@ -26,10 +26,10 @@ local function set_group_photo(msg, success, result)
     save_data(_config.moderation.data, data)
     data[tostring(msg.to.id)]['settings']['lock_photo'] = 'yes'
     save_data(_config.moderation.data, data)
-    send_large_msg(receiver, 'Photo saved!', ok_cb, false)
+    send_large_msg(receiver, 'Photo saved.', ok_cb, false)
   else
     print('Error downloading: '..msg.id)
-    send_large_msg(receiver, 'Failed, please try again!', ok_cb, false)
+    send_large_msg(receiver, 'Failed, please try again.', ok_cb, false)
   end
 end
 
@@ -130,7 +130,7 @@ function run(msg, matches)
           local link = data[tostring(msg.to.id)]['link']
           return about.."\n\n"..link
         else
-          return 'Invite link does not exist.\nTry !link set to generate.'
+          return 'Invite link does not exist.\nTry .link set to generate.'
         end
       elseif matches[2] == 'set' and is_mod(msg) then
         msgr = export_chat_link(receiver, export_chat_link_cb, {data=data, msg=msg})
@@ -268,7 +268,7 @@ function run(msg, matches)
           settings.sticker = 'kick'
           save_data(_config.moderation.data, data)
         end
-        return 'Stickers already prohibited.\nSender will be kicked!'
+        return 'Stickers already prohibited.\nSender will be kicked.'
       elseif matches[2] == 'ok' then
         if settings.sticker == 'ok' then
           return 'Sticker restriction is not enabled.'
@@ -324,14 +324,14 @@ function run(msg, matches)
         if is_sticker_offender then
           chat_del_user(receiver, 'user#id'..user_id, ok_cb, true)
           redis:del(sticker_hash)
-          return 'You have been warned to not sending sticker into this group!'
+          return 'You have been warned to not sending sticker into this group.'
         elseif not is_sticker_offender then
           redis:set(sticker_hash, true)
-          return 'DO NOT send sticker into this group!\nThis is a WARNING, next time you will be kicked!'
+          return 'DO NOT send sticker into this group.\nThis is a WARNING, next time you will be kicked.'
         end
       elseif settings.sticker == 'kick' then
         chat_del_user(receiver, 'user#id'..user_id, ok_cb, true)
-        return 'DO NOT send sticker into this group!'
+        return 'DO NOT send sticker into this group.'
       elseif settings.sticker == 'ok' then
         return nil
       end
@@ -364,50 +364,50 @@ return {
   description = 'Plugin to manage group chat.',
   usage = {
     admin = {
-      '!mkgroup <group_name> : Make/create a new group.',
-      '!addgroup : Add group to moderation list.',
-      '!remgroup : Remove group from moderation list.'
+      '.mkgroup <group_name> : Make/create a new group.',
+      '.addgroup : Add group to moderation list.',
+      '.remgroup : Remove group from moderation list.'
     },
     moderator = {
-      '!group <lock|unlock> bot : {Dis}allow APIs bots.',
-      '!group <lock|unlock> member : Lock/unlock group member.',
-      '!group <lock|unlock> name : Lock/unlock group name.',
-      '!group <lock|unlock> photo : Lock/unlock group photo.',
-      '!group settings : Show group settings.',
-      '!link <set> : Generate/revoke invite link.',
-      '!setabout <description> : Set group description.',
-      '!setname <new_name> : Set group name.',
-      '!setphoto : Set group photo.',
-      '!setrules <rules> : Set group rules.',
-      '!sticker warn : Sticker restriction, sender will be warned for the first violation.',
-      '!sticker kick : Sticker restriction, sender will be kick.',
-      '!sticker ok : Disable sticker restriction.'
+      '.group <lock|unlock> bot : {Dis}allow APIs bots.',
+      '.group <lock|unlock> member : Lock/unlock group member.',
+      '.group <lock|unlock> name : Lock/unlock group name.',
+      '.group <lock|unlock> photo : Lock/unlock group photo.',
+      '.group settings : Show group settings.',
+      '.link <set> : Generate/revoke invite link.',
+      '.setabout <description> : Set group description.',
+      '.setname <new_name> : Set group name.',
+      '.setphoto : Set group photo.',
+      '.setrules <rules> : Set group rules.',
+      '.sticker warn : Sticker restriction, sender will be warned for the first violation.',
+      '.sticker kick : Sticker restriction, sender will be kick.',
+      '.sticker ok : Disable sticker restriction.'
     },
     user = {
-      '!about : Read group description',
-      '!rules : Read group rules',
-      '!link <get> : Print invite link'
+      '.about : Read group description',
+      '.rules : Read group rules',
+      '.link <get> : Print invite link'
     },
   },
   patterns = {
-    "^!(about)$",
-    "^!(addgroup)$",
+    "^.(about)$",
+    "^.(addgroup)$",
     "%[(audio)%]",
     "%[(document)%]",
-    "^!(group) (lock) (.*)$",
-    "^!(group) (settings)$",
-    "^!(group) (unlock) (.*)$",
-    "^!(link) (.*)$",
-    "^!(mkgroup) (.*)$",
+    "^.(group) (lock) (.*)$",
+    "^.(group) (settings)$",
+    "^.(group) (unlock) (.*)$",
+    "^.(link) (.*)$",
+    "^.(mkgroup) (.*)$",
     "%[(photo)%]",
-    "^!(remgroup)$",
-    "^!(rules)$",
-    "^!(setabout) (.*)$",
-    "^!(setname) (.*)$",
-    "^!(setphoto)$",
-    "^!(setrules) (.*)$",
-    "^!(sticker) (.*)$",
-    "^!!tgservice (.+)$",
+    "^.(remgroup)$",
+    "^.(rules)$",
+    "^.(setabout) (.*)$",
+    "^.(setname) (.*)$",
+    "^.(setphoto)$",
+    "^.(setrules) (.*)$",
+    "^.(sticker) (.*)$",
+    "^..tgservice (.+)$",
     "%[(video)%]"
   },
   run = run,
