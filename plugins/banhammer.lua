@@ -3,8 +3,8 @@
 do
 
   -- make sure to set with value that not higher than stats.lua
-  local NUM_MSG_MAX = 4  -- Max number of messages per TIME_CHECK seconds
-  local TIME_CHECK = 4
+  local NUM_MSG_MAX = 3  -- Max number of messages per TIME_CHECK seconds
+  local TIME_CHECK = 2
 
   local function is_user_whitelisted(id)
     return redis:get('whitelist:user#id'..id) or false
@@ -38,13 +38,13 @@ do
       return redis:get('sbned:'..user_id) or false
   end
 
-  local function unb_user(user_id, chat_id)
+  local function ub_user(user_id, chat_id)
     redis:del('bned:'..chat_id..':'..user_id)
   end
 
-  local function sunb_user(user_id, chat_id)
+  local function sub_user(user_id, chat_id)
     redis:del('sbned:'..user_id)
-    return 'User '..user_id..' unbned'
+    return 'User '..user_id..' ubned'
   end
 
   local function is_bned(user_id, chat_id)
@@ -72,17 +72,17 @@ do
           end
         end
       end
-      if matches[1] == 'unb' then
+      if matches[1] == 'ub' then
         if is_bned(matches[2], chat_id) then
-          unb_user(matches[2], chat_id)
-          send_large_msg(receiver, 'User with ID ['..matches[2]..'] is unbned.')
+          ub_user(matches[2], chat_id)
+          send_large_msg(receiver, 'User with ID ['..matches[2]..'] is ubned.')
         else
           send_large_msg(receiver, 'No user with ID '..matches[2]..' in (s)b list.')
         end
-      elseif matches[1] == 'sunb' then
+      elseif matches[1] == 'sub' then
         if is_s_bned(matches[2]) then
-          sunb_user(matches[2], chat_id)
-          send_large_msg(receiver, 'User with ID ['..matches[2]..'] is globally unbned.')
+          sub_user(matches[2], chat_id)
+          send_large_msg(receiver, 'User with ID ['..matches[2]..'] is globally ubned.')
         else
           send_large_msg(receiver, 'No user with ID '..matches[2]..' in (s)b list.')
         end
@@ -109,12 +109,12 @@ do
       elseif extra.match == 'sb' then
         sb_user(user_id, chat_id)
         send_large_msg(receiver, full_name..' ['..user_id..'] globally bned!')
-      elseif extra.match == 'unb' then
-        unb_user(user_id, chat_id)
-        send_msg(receiver, 'User '..user_id..' unbned', ok_cb,  true)
-      elseif extra.match == 'sunb' then
-        sunb_user(user_id, chat_id)
-        send_large_msg(receiver, full_name..' ['..user_id..'] globally unbned!')
+      elseif extra.match == 'ub' then
+        ub_user(user_id, chat_id)
+        send_msg(receiver, 'User '..user_id..' ubned', ok_cb,  true)
+      elseif extra.match == 'sub' then
+        sub_user(user_id, chat_id)
+        send_large_msg(receiver, full_name..' ['..user_id..'] globally ubned!')
       end
     else
       return 'Use This in Your Groups'
@@ -146,12 +146,12 @@ do
           elseif extra.match == 'sb' then
             sb_user(user_id, chat_id)
             send_msg(receiver, 'User @'..username..' ['..user_id..'] globally bned!', ok_cb,  true)
-          elseif extra.match == 'unb' then
-            unb_user(user_id, chat_id)
-            send_msg(receiver, 'User @'..username..' unbned', ok_cb,  true)
-          elseif extra.match == 'sunb' then
-            sunb_user(user_id, chat_id)
-            send_msg(receiver, 'User @'..username..' ['..user_id..'] globally unbned!', ok_cb,  true)
+          elseif extra.match == 'ub' then
+            ub_user(user_id, chat_id)
+            send_msg(receiver, 'User @'..username..' ubned', ok_cb,  true)
+          elseif extra.match == 'sb' then
+            sub_user(user_id, chat_id)
+            send_msg(receiver, 'User @'..username..' ['..user_id..'] globally ubned!', ok_cb,  true)
           end
         end
       else
@@ -169,21 +169,21 @@ do
     local receiver = get_receiver(msg)
     local user = 'user#id'..user_id
 
-    -- antiflood
-    local post_count = 'nc:'..user_id..':'..chat_id
+    -- ANTI FLOOD
+    local post_count = 'floodc:'..user_id..':'..chat_id
     redis:incr(post_count)
     if msg.from.type == 'user' then
-      local post_count = 'user:'..user_id..':nc'
+      local post_count = 'user:'..user_id..':floodc'
       local msgs = tonumber(redis:get(post_count) or 0)
-      local text = 'User '..user_id..' is ning'
+      
       if msgs > NUM_MSG_MAX and not is_sudo(msg) then
         local data = load_data(_config.moderation.data)
-        local a_n_stat = data[tostring(chat_id)]['settings']['a_n']
-        if a_n_stat == 'kick' then
+        local anti_flood_stat = data[tostring(chat_id)]['settings']['anti_flood']
+        if anti_flood_stat == 'kick' then
           send_large_msg(receiver, text)
           kick_user(user_id, chat_id)
           msg = nil
-        elseif a_n_stat == 'b' then
+        elseif anti_flood_stat == 'b' then
           send_large_msg(receiver, text)
           b_user(user_id, chat_id)
           send_msg(receiver, 'User '..user_id..' bned', ok_cb,  true)
@@ -297,7 +297,7 @@ do
             text = text..k..'. '..v..'\n'
           end
           return string.gsub(text, 'bned:'..msg.to.id..':', '')
-        elseif matches[1] == 'unb' then
+        elseif matches[1] == 'ub' then
           if msg.reply_id then
             msgr = get_message(msg.reply_id, action_by_reply, {msg=msg, match=matches[1]})
           elseif string.match(matches[2], '^%d+$') then
@@ -310,26 +310,26 @@ do
           local data = load_data(_config.moderation.data)
           local settings = data[tostring(msg.to.id)]['settings']
           if matches[2] == 'kick' then
-            if settings.a_n ~= 'kick' then
-              settings.a_n = 'kick'
+            if settings.anti_flood ~= 'kick' then
+              settings.anti_flood = 'kick'
               save_data(_config.moderation.data, data)
             end
-              return 'a n protection already enabled.\nner will be kicked.'
+              return 'Anti flood protection already enabled.\nFlooder will be kicked.'
             end
           if matches[2] == 'b' then
-            if settings.a_n ~= 'b' then
-              settings.a_n = 'b'
+            if settings.anti_flood ~= 'b' then
+              settings.anti_flood = 'b'
               save_data(_config.moderation.data, data)
             end
-              return 'a n  protection already enabled.\nner will be bned.'
+              return 'Anti flood  protection already enabled.\nFlooder will be bned.'
             end
           if matches[2] == 'disable' then
-            if settings.a_n == 'no' then
-              return 'a n  protection is not enabled.'
+            if settings.anti_flood == 'no' then
+              return 'Anti flood  protection is not enabled.'
             else
-              settings.a_n = 'no'
+              settings.anti_flood = 'no'
               save_data(_config.moderation.data, data)
-              return 'a n  protection has been disabled.'
+              return 'Anti flood  protection has been disabled.'
             end
           end
         end
@@ -364,7 +364,7 @@ do
           elseif string.match(matches[2], '^@.+$') then
             msgr = res_user(string.gsub(matches[2], '@', ''), resolve_username, {msg=msg, match=matches[1]})
           end
-        elseif matches[1] == 'sunb' then
+        elseif matches[1] == 'sub' then
           if msg.reply_id then
             msgr = get_message(msg.reply_id, action_by_reply, {msg=msg, match=matches[1]})
           elseif string.match(matches[2], '^%d+$') then
@@ -388,18 +388,18 @@ do
       admin = {
         "!sb : If type in reply, will b user globally.",
         "!sb <user_id>/@<username> : Kick user_id/username from all chat and kicks it if joins again",
-        "!sunb : If type in reply, will unb user globally.",
-        "!sunb <user_id>/@<username> : Unb user_id/username globally."
+        "!sub : If type in reply, will ub user globally.",
+        "!sb <user_id>/@<username> : ub user_id/username globally."
       },
       moderator = {
-        "!an kick : Enable n protection. ner will be kicked.",
-        "!an b : Enable n protection. ner will be bned.",
-        "!an disable : Disable n protection",
+        "!an kick : Enable flood protection. Flooder will be kicked.",
+        "!an b : Enable flood protection. Flooder will be bned.",
+        "!an disable : Disable flood protection",
         "!b : If type in reply, will b user from chat group.",
         "!b <user_id>/<@username>: Kick user from chat and kicks it if joins chat again",
         "!blist : List users bned from chat group.",
-        "!unb : If type in reply, will unb user from chat group.",
-        "!unb <user_id>/<@username>: Unb user",
+        "!ub : If type in reply, will ub user from chat group.",
+        "!ub <user_id>/<@username>: ub user",
         "!kick : If type in reply, will kick user from chat group.",
         "!kick <user_id>/<@username>: Kick user from chat group",
         "!whitelist chat: Allow everybody on current chat to use the bot when whitelist mode is enabled",
@@ -414,8 +414,8 @@ do
       "^!(b) (.*)$",
       "^!(b)$",
       "^!(blist)$",
-      "^!(unb) (.*)$",
-      "^!(unb)$",
+      "^!(ub) (.*)$",
+      "^!(ub)$",
       "^!(kick) (.+)$",
       "^!(kick)$",
       "^!(kickme)$",
@@ -428,8 +428,8 @@ do
       "^!(whitelist) (user) (%d+)$",
       "^!(sb)$",
       "^!(sb) (.*)$",
-      "^!(sunb)$",
-      "^!(sunb) (.*)$"
+      "^!(sub)$",
+      "^!(sub) (.*)$"
     },
     run = run,
     pre_process = pre_process
