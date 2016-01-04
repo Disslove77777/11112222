@@ -29,13 +29,13 @@ do
     kick_user(user_id, chat_id)
   end
 
-  local function sb_user(user_id, chat_id)
-    redis:set('sbned:'..user_id, true)
+  local function superban_user(user_id, chat_id)
+    redis:set('superbanned:'..user_id, true)
     kick_user(user_id, chat_id)
   end
 
   local function is_super_banned(user_id)
-      return redis:get('sbned:'..user_id) or false
+      return redis:get('superbanned:'..user_id) or false
   end
 
   local function unban_user(user_id, chat_id)
@@ -43,7 +43,7 @@ do
   end
 
   local function superunban_user(user_id, chat_id)
-    redis:del('sbned:'..user_id)
+    redis:del('superbanned:'..user_id)
     return 'User '..user_id..' unbanned'
   end
 
@@ -64,8 +64,8 @@ do
           if matches[1] == 'ban' then
             ban_user(matches[2], chat_id)
             send_large_msg(receiver, full_name..' ['..matches[2]..'] banned', ok_cb,  true)
-          elseif matches[1] == 'sb' then
-            sb_user(matches[2], chat_id)
+          elseif matches[1] == 'superban' then
+            superban_user(matches[2], chat_id)
             send_large_msg(receiver, full_name..' ['..matches[2]..'] globally banned!', ok_cb, true)
           elseif matches[1] == 'kick' then
             kick_user(matches[2], chat_id)
@@ -106,8 +106,8 @@ do
       elseif extra.match == 'ban' then
         ban_user(user_id, chat_id)
         send_msg(receiver, 'User '..user_id..' banned', ok_cb,  true)
-      elseif extra.match == 'sb' then
-        sb_user(user_id, chat_id)
+      elseif extra.match == 'superban' then
+        superban_user(user_id, chat_id)
         send_large_msg(receiver, full_name..' ['..user_id..'] globally banned!')
       elseif extra.match == 'unban' then
         unban_user(user_id, chat_id)
@@ -143,8 +143,8 @@ do
           elseif extra.match == 'ban' then
             ban_user(user_id, chat_id)
             send_msg(receiver, 'User @'..username..' banned', ok_cb,  true)
-          elseif extra.match == 'sb' then
-            sb_user(user_id, chat_id)
+          elseif extra.match == 'superban' then
+            superban_user(user_id, chat_id)
             send_msg(receiver, 'User @'..username..' ['..user_id..'] globally banned!', ok_cb,  true)
           elseif extra.match == 'unban' then
             unban_user(user_id, chat_id)
@@ -217,8 +217,8 @@ do
     -- BANNED USER TALKING
     if is_chat_msg(msg) then
       if is_super_banned(user_id) then
-        print('sbned user talking!')
-        sb_user(user_id, chat_id)
+        print('SuperBanned user talking!')
+        superban_user(user_id, chat_id)
         msg.text = ''
       end
       if is_banned(user_id, chat_id) then
@@ -356,7 +356,7 @@ do
         end
       end
       if is_admin(msg) then
-        if matches[1] == 'sb' then
+        if matches[1] == 'superban' then
           if msg.reply_id then
             msgr = get_message(msg.reply_id, action_by_reply, {msg=msg, match=matches[1]})
           elseif string.match(matches[2], '^%d+$') then
