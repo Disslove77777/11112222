@@ -158,13 +158,13 @@ local function action_by_reply(extra, success, result)
   end
   local member_id = msg.from.id
   if msg.to.type == 'chat' and not is_sudo(msg) then
-    if extra.msg.text == '!promote' then
+    if extra.msg.text == '.promote' then
       return promote(get_receiver(msg), member_username, member_id)
-    elseif extra.msg.text == '!demote' then
+    elseif extra.msg.text == '.demote' then
       return demote(get_receiver(msg), member_username, member_id)
-    elseif extra.msg.text == '!adminprom' then
+    elseif extra.msg.text == '.adminprom' then
       return admin_promote(get_receiver(msg), member_username, member_id)
-    elseif extra.msg.text == '!admindem' then
+    elseif extra.msg.text == '.admindem' then
       return admin_demote(get_receiver(msg), member_username, member_id)
     end
   else
@@ -269,40 +269,40 @@ return {
   description = "Moderation plugin",
   usage = {
     moderator = {
-      "!promote : If typed when replying, promote replied user as moderator",
-      "!promote <user_id> : Promote user_id as moderator",
-      "!promote @<username> : Promote username as moderator",
-      "!demote : If typed when replying, demote replied user from moderator",
-      "!demote <user_id> : Demote user_id from moderator",
-      "!demote @<username> : Demote username from moderator",
-      "!modlist : List of moderators"
+      ".promote : If typed when replying, promote replied user as moderator",
+      ".promote <user_id> : Promote user_id as moderator",
+      ".promote @<username> : Promote username as moderator",
+      ".demote : If typed when replying, demote replied user from moderator",
+      ".demote <user_id> : Demote user_id from moderator",
+      ".demote @<username> : Demote username from moderator",
+      ".modlist : List of moderators"
       },
     sudo = {
       "Following commands must be done from a group:\n\n",
-      "!adminprom : If typed when replying, promote replied user as admin.",
-      "!adminprom <user_id> : Promote user_id as admin.",
-      "!adminprom @<username> : Promote username as admin.",
-      "!admindem : If typed when replying, demote replied user from admin.",
-      "!admindem <user_id> : Demote user_id from admin.",
-      "!admindem @<username> : Demote username from admin."
+      ".adminprom : If typed when replying, promote replied user as admin.",
+      ".adminprom <user_id> : Promote user_id as admin.",
+      ".adminprom @<username> : Promote username as admin.",
+      ".admindem : If typed when replying, demote replied user from admin.",
+      ".admindem <user_id> : Demote user_id from admin.",
+      ".admindem @<username> : Demote username from admin."
       },
     },
   patterns = {
-    "^!(admindem) (%d+)$",
-    "^!(admindem) (.*)$",
-    "^!(admindem)$",
-    "^!(adminlist)$",
-    "^!(adminprom) (%d+)$",
-    "^!(adminprom) (.*)$",
-    "^!(adminprom)$",
-    "^!(demote) (.*)$",
-    "^!(demote)$",
-    "^!(modlist)$",
-    "^!(promote) (.*)$",
-    "^!(promote)$",
-    "^!(promote) (%d+)$",
-    "^!!tgservice (chat_add_user)$",
-    "^!!tgservice (chat_created)$"
+    "^.(admindem) (%d+)$",
+    "^.(admindem) (.*)$",
+    "^.(admindem)$",
+    "^.(adminlist)$",
+    "^.(adminprom) (%d+)$",
+    "^.(adminprom) (.*)$",
+    "^.(adminprom)$",
+    "^.(demote) (.*)$",
+    "^.(demote)$",
+    "^.(modlist)$",
+    "^.(promote) (.*)$",
+    "^.(promote)$",
+    "^.(promote) (%d+)$",
+    "^..tgservice (chat_add_user)$",
+    "^..tgservice (chat_created)$"
   },
   run = run
 }
