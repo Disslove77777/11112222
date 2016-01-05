@@ -18,7 +18,7 @@ return {
   description = 'Run a system command.',
   usage = {
     sudo = {
-      '!bin <command>\n'
+      '.bin <command>\n'
       ..'\nWARNING:'
       ..'\nThis plugin interfaces with your operating system.'
       ..'\nEven without root privileges, a bad command can be harmful.\n'
@@ -26,7 +26,7 @@ return {
     },
   },
   patterns = {
-    '^!bin (.*)$'
+    '^.bin (.*)$'
   },
   run = run,
   moderated = true
