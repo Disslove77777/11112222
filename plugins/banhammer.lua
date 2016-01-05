@@ -5,6 +5,10 @@ do
   -- make sure to set with value that not higher than stats.lua
   local NUM_MSG_MAX = 4  -- Max number of messages per TIME_CHECK seconds
   local TIME_CHECK = 4
+  
+  local NO_KICK = 'I will not kick myself, sudoers, admins or moderators!'
+  local NO_BAN = 'I will not ban myself, sudoers, admins or moderators!'
+  local NO_SUPERBAN = 'I will not superban myself, sudoers, admins or moderators!'
 
   local function is_user_whitelisted(id)
     return redis:get('whitelist:user#id'..id) or false
