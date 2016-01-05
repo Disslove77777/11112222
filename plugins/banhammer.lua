@@ -6,7 +6,7 @@ do
   local NUM_MSG_MAX = 4  -- Max number of messages per TIME_CHECK seconds
   local TIME_CHECK = 4
   
-  local NO_KICK = 'I will not kick myself, sudoers, admins or moderators!'
+  local NO_k = 'I will not k myself, sudoers, admins or moderators!'
   local NO_b = 'I will not b myself, sudoers, admins or moderators!'
   local NO_SUPERb = 'I will not superb myself, sudoers, admins or moderators!'
 
@@ -18,9 +18,9 @@ do
     return redis:get('whitelist:chat#id'..id) or false
   end
 
-  local function kick_user(user_id, chat_id)
+  local function k_user(user_id, chat_id)
     if user_id == tostring(our_id) then
-      send_msg('chat#id'..chat_id, "I won't kick myself.", ok_cb,  true)
+      send_msg('chat#id'..chat_id, "I won't k myself.", ok_cb,  true)
     else
       chat_del_user('chat#id'..chat_id, 'user#id'..user_id, ok_cb, true)
     end
@@ -29,13 +29,13 @@ do
   local function b_user(user_id, chat_id)
     -- Save to redis
     redis:set('bned:'..chat_id..':'..user_id, true)
-    -- Kick from chat
-    kick_user(user_id, chat_id)
+    -- k from chat
+    k_user(user_id, chat_id)
   end
 
   local function sub_user(user_id, chat_id)
     redis:set('subned:'..user_id, true)
-    kick_user(user_id, chat_id)
+    k_user(user_id, chat_id)
   end
 
   local function is_su_bned(user_id)
@@ -71,8 +71,8 @@ do
           elseif matches[1] == 'sub' then
             sub_user(matches[2], chat_id)
             send_large_msg(receiver, full_name..' ['..matches[2]..'] globally bned.', ok_cb, true)
-          elseif matches[1] == 'kick' then
-            kick_user(matches[2], chat_id)
+          elseif matches[1] == 'k' then
+            k_user(matches[2], chat_id)
           end
         end
       end
@@ -105,7 +105,7 @@ do
     local user = 'user#id'..msg.from.id
     local full_name = (msg.from.first_name or '')..' '..(msg.from.last_name or '')
     if is_chat_msg(msg) and not is_sudo(msg) then
-      if extra.match == 'kick' then
+      if extra.match == 'k' then
         chat_del_user(receiver, user, ok_cb, false)
       elseif extra.match == 'b' then
         b_user(user_id, chat_id)
@@ -142,7 +142,7 @@ do
           end
         end
         if not is_sudoers then
-          if extra.match == 'kick' then
+          if extra.match == 'k' then
             chat_del_user(receiver, user, ok_cb, false)
           elseif extra.match == 'b' then
             b_user(user_id, chat_id)
@@ -183,9 +183,9 @@ do
       if msgs > NUM_MSG_MAX and not is_sudo(msg) then
         local data = load_data(_config.moderation.data)
         local anti_flood_stat = data[tostring(chat_id)]['settings']['anti_flood']
-        if anti_flood_stat == 'kick' then
+        if anti_flood_stat == 'k' then
           send_large_msg(receiver, text)
-          kick_user(user_id, chat_id)
+          k_user(user_id, chat_id)
           msg = nil
         elseif anti_flood_stat == 'b' then
           send_large_msg(receiver, text)
@@ -211,7 +211,7 @@ do
         print('Checking invited user '..user_id)
         if is_su_bned(user_id) or is_bned(user_id, chat_id) then
           print('User is bned.')
-          kick_user(user_id, chat_id)
+          k_user(user_id, chat_id)
         end
       end
       -- No further checks
@@ -269,17 +269,17 @@ do
     local user = 'user#id'..(matches[2] or '')
 
     if is_chat_msg(msg) then
-      if matches[1] == 'kickme' then
+      if matches[1] == 'kme' then
         if is_sudo(msg) or is_admin(msg) then
-          return "I won't kick an admin."
+          return "I won't k an admin."
         elseif is_mod(msg) then
-          return "I won't kick a moderator."
+          return "I won't k a moderator."
         else
-          kick_user(msg.from.id, msg.to.id)
+          k_user(msg.from.id, msg.to.id)
         end
       end
       if is_mod(msg) then
-        if matches[1] == 'kick' then
+        if matches[1] == 'k' then
           if msg.reply_id then
             msgr = get_message(msg.reply_id, action_by_reply, {msg=msg, match=matches[1]})
           elseif string.match(matches[2], '^%d+$') then
@@ -313,12 +313,12 @@ do
         if matches[1] == 'an' then
           local data = load_data(_config.moderation.data)
           local settings = data[tostring(msg.to.id)]['settings']
-          if matches[2] == 'kick' then
-            if settings.anti_flood ~= 'kick' then
-              settings.anti_flood = 'kick'
+          if matches[2] == 'k' then
+            if settings.anti_flood ~= 'k' then
+              settings.anti_flood = 'k'
               save_data(_config.moderation.data, data)
             end
-              return 'Anti flood protection already enabled.\nFlooder will be kicked.'
+              return 'Anti flood protection already enabled.\nFlooder will be ked.'
             end
           if matches[2] == 'b' then
             if settings.anti_flood ~= 'b' then
@@ -384,28 +384,28 @@ do
   end
 
   return {
-    description = "Plugin to manage bs, kicks and white/black lists.",
+    description = "Plugin to manage bs, ks and white/black lists.",
     usage = {
       user = {
-        ".kickme : Kick yourself out of this group."
+        ".kme : k yourself out of this group."
       },
       admin = {
         ".sub : If type in reply, will b user globally.",
-        ".sub <user_id>/@<username> : Kick user_id/username from all chat and kicks it if joins again",
+        ".sub <user_id>/@<username> : k user_id/username from all chat and ks it if joins again",
         ".suunb : If type in reply, will unb user globally.",
         ".suunb <user_id>/@<username> : Unb user_id/username globally."
       },
       moderator = {
-        ".an kick : Enable flood protection. Flooder will be kicked.",
+        ".an k : Enable flood protection. Flooder will be ked.",
         ".an b : Enable flood protection. Flooder will be bned.",
         ".an disable : Disable flood protection",
         ".b : If type in reply, will b user from chat group.",
-        ".b <user_id>/<@username>: Kick user from chat and kicks it if joins chat again",
+        ".b <user_id>/<@username>: k user from chat and ks it if joins chat again",
         ".blist : List users bned from chat group.",
         ".unb : If type in reply, will unb user from chat group.",
         ".unb <user_id>/<@username>: Unb user",
-        ".kick : If type in reply, will kick user from chat group.",
-        ".kick <user_id>/<@username>: Kick user from chat group",
+        ".k : If type in reply, will k user from chat group.",
+        ".k <user_id>/<@username>: k user from chat group",
         ".whitelist chat: Allow everybody on current chat to use the bot when whitelist mode is enabled",
         ".whitelist delete chat: Remove chat from whitelist",
         ".whitelist delete user <user_id>: Remove user from whitelist",
@@ -420,9 +420,9 @@ do
       "^.(blist)$",
       "^.(unb) (.*)$",
       "^.(unb)$",
-      "^.(kick) (.+)$",
-      "^.(kick)$",
-      "^.(kickme)$",
+      "^.(k) (.+)$",
+      "^.(k)$",
+      "^.(kme)$",
       "^..tgservice (.+)$",
       "^.(whitelist) (chat)$",
       "^.(whitelist) (delete) (chat)$",
