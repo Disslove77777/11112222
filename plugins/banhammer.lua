@@ -7,8 +7,8 @@ do
   local TIME_CHECK = 4
   
   local NO_KICK = 'I will not kick myself, sudoers, admins or moderators!'
-  local NO_BAN = 'I will not ban myself, sudoers, admins or moderators!'
-  local NO_SUPERBAN = 'I will not superban myself, sudoers, admins or moderators!'
+  local NO_b = 'I will not b myself, sudoers, admins or moderators!'
+  local NO_SUPERb = 'I will not superb myself, sudoers, admins or moderators!'
 
   local function is_user_whitelisted(id)
     return redis:get('whitelist:user#id'..id) or false
@@ -26,33 +26,33 @@ do
     end
   end
 
-  local function ban_user(user_id, chat_id)
+  local function b_user(user_id, chat_id)
     -- Save to redis
-    redis:set('banned:'..chat_id..':'..user_id, true)
+    redis:set('bned:'..chat_id..':'..user_id, true)
     -- Kick from chat
     kick_user(user_id, chat_id)
   end
 
-  local function suban_user(user_id, chat_id)
-    redis:set('subanned:'..user_id, true)
+  local function sub_user(user_id, chat_id)
+    redis:set('subned:'..user_id, true)
     kick_user(user_id, chat_id)
   end
 
-  local function is_su_banned(user_id)
-      return redis:get('subanned:'..user_id) or false
+  local function is_su_bned(user_id)
+      return redis:get('subned:'..user_id) or false
   end
 
-  local function unban_user(user_id, chat_id)
-    redis:del('banned:'..chat_id..':'..user_id)
+  local function unb_user(user_id, chat_id)
+    redis:del('bned:'..chat_id..':'..user_id)
   end
 
-  local function suunban_user(user_id, chat_id)
-    redis:del('subanned:'..user_id)
-    return 'User '..user_id..' unbanned'
+  local function suunb_user(user_id, chat_id)
+    redis:del('subned:'..user_id)
+    return 'User '..user_id..' unbned'
   end
 
-  local function is_banned(user_id, chat_id)
-    return redis:get('banned:'..chat_id..':'..user_id) or false
+  local function is_bned(user_id, chat_id)
+    return redis:get('bned:'..chat_id..':'..user_id) or false
   end
 
   local function action_by_id(extra, success, result)
@@ -65,30 +65,30 @@ do
         if matches[2] == tostring(v.id) then
           group_member = true
           local full_name = (v.first_name or '')..' '..(v.last_name or '')
-          if matches[1] == 'ban' then
-            ban_user(matches[2], chat_id)
-            send_large_msg(receiver, full_name..' ['..matches[2]..'] banned', ok_cb,  true)
-          elseif matches[1] == 'suban' then
-            suban_user(matches[2], chat_id)
-            send_large_msg(receiver, full_name..' ['..matches[2]..'] globally banned.', ok_cb, true)
+          if matches[1] == 'b' then
+            b_user(matches[2], chat_id)
+            send_large_msg(receiver, full_name..' ['..matches[2]..'] bned', ok_cb,  true)
+          elseif matches[1] == 'sub' then
+            sub_user(matches[2], chat_id)
+            send_large_msg(receiver, full_name..' ['..matches[2]..'] globally bned.', ok_cb, true)
           elseif matches[1] == 'kick' then
             kick_user(matches[2], chat_id)
           end
         end
       end
-      if matches[1] == 'unban' then
-        if is_banned(matches[2], chat_id) then
-          unban_user(matches[2], chat_id)
-          send_large_msg(receiver, 'User with ID ['..matches[2]..'] is unbanned.')
+      if matches[1] == 'unb' then
+        if is_bned(matches[2], chat_id) then
+          unb_user(matches[2], chat_id)
+          send_large_msg(receiver, 'User with ID ['..matches[2]..'] is unbned.')
         else
-          send_large_msg(receiver, 'No user with ID '..matches[2]..' in (su)ban list.')
+          send_large_msg(receiver, 'No user with ID '..matches[2]..' in (su)b list.')
         end
-      elseif matches[1] == 'suunban' then
-        if is_su_banned(matches[2]) then
-          suunban_user(matches[2], chat_id)
-          send_large_msg(receiver, 'User with ID ['..matches[2]..'] is globally unbanned.')
+      elseif matches[1] == 'suunb' then
+        if is_su_bned(matches[2]) then
+          suunb_user(matches[2], chat_id)
+          send_large_msg(receiver, 'User with ID ['..matches[2]..'] is globally unbned.')
         else
-          send_large_msg(receiver, 'No user with ID '..matches[2]..' in (su)ban list.')
+          send_large_msg(receiver, 'No user with ID '..matches[2]..' in (su)b list.')
         end
       end
       if not group_member then
@@ -107,18 +107,18 @@ do
     if is_chat_msg(msg) and not is_sudo(msg) then
       if extra.match == 'kick' then
         chat_del_user(receiver, user, ok_cb, false)
-      elseif extra.match == 'ban' then
-        ban_user(user_id, chat_id)
-        send_msg(receiver, 'User '..user_id..' banned', ok_cb,  true)
-      elseif extra.match == 'suban' then
-        suban_user(user_id, chat_id)
-        send_large_msg(receiver, full_name..' ['..user_id..'] globally banned.')
-      elseif extra.match == 'unban' then
-        unban_user(user_id, chat_id)
-        send_msg(receiver, 'User '..user_id..' unbanned', ok_cb,  true)
-      elseif extra.match == 'suunban' then
-        suunban_user(user_id, chat_id)
-        send_large_msg(receiver, full_name..' ['..user_id..'] globally unbanned.')
+      elseif extra.match == 'b' then
+        b_user(user_id, chat_id)
+        send_msg(receiver, 'User '..user_id..' bned', ok_cb,  true)
+      elseif extra.match == 'sub' then
+        sub_user(user_id, chat_id)
+        send_large_msg(receiver, full_name..' ['..user_id..'] globally bned.')
+      elseif extra.match == 'unb' then
+        unb_user(user_id, chat_id)
+        send_msg(receiver, 'User '..user_id..' unbned', ok_cb,  true)
+      elseif extra.match == 'suunb' then
+        suunb_user(user_id, chat_id)
+        send_large_msg(receiver, full_name..' ['..user_id..'] globally unbned.')
       end
     else
       return 'Use This in Your Groups'
@@ -144,18 +144,18 @@ do
         if not is_sudoers then
           if extra.match == 'kick' then
             chat_del_user(receiver, user, ok_cb, false)
-          elseif extra.match == 'ban' then
-            ban_user(user_id, chat_id)
-            send_msg(receiver, 'User @'..username..' banned', ok_cb,  true)
-          elseif extra.match == 'suban' then
-            suban_user(user_id, chat_id)
-            send_msg(receiver, 'User @'..username..' ['..user_id..'] globally banned.', ok_cb,  true)
-          elseif extra.match == 'unban' then
-            unban_user(user_id, chat_id)
-            send_msg(receiver, 'User @'..username..' unbanned', ok_cb,  true)
-          elseif extra.match == 'suunban' then
-            suunban_user(user_id, chat_id)
-            send_msg(receiver, 'User @'..username..' ['..user_id..'] globally unbanned.', ok_cb,  true)
+          elseif extra.match == 'b' then
+            b_user(user_id, chat_id)
+            send_msg(receiver, 'User @'..username..' bned', ok_cb,  true)
+          elseif extra.match == 'sub' then
+            sub_user(user_id, chat_id)
+            send_msg(receiver, 'User @'..username..' ['..user_id..'] globally bned.', ok_cb,  true)
+          elseif extra.match == 'unb' then
+            unb_user(user_id, chat_id)
+            send_msg(receiver, 'User @'..username..' unbned', ok_cb,  true)
+          elseif extra.match == 'suunb' then
+            suunb_user(user_id, chat_id)
+            send_msg(receiver, 'User @'..username..' ['..user_id..'] globally unbned.', ok_cb,  true)
           end
         end
       else
@@ -187,10 +187,10 @@ do
           send_large_msg(receiver, text)
           kick_user(user_id, chat_id)
           msg = nil
-        elseif anti_flood_stat == 'ban' then
+        elseif anti_flood_stat == 'b' then
           send_large_msg(receiver, text)
-          ban_user(user_id, chat_id)
-          send_msg(receiver, 'User '..user_id..' banned', ok_cb,  true)
+          b_user(user_id, chat_id)
+          send_msg(receiver, 'User '..user_id..' bned', ok_cb,  true)
           msg = nil
         end
       end
@@ -200,7 +200,7 @@ do
     -- SERVICE MESSAGE
     if msg.action and msg.action.type then
       local action = msg.action.type
-      -- Check if banned user joins chat
+      -- Check if bned user joins chat
       if action == 'chat_add_user' or action == 'chat_add_user_link' then
         local user_id
         if msg.action.link_issuer then
@@ -209,8 +209,8 @@ do
 	        user_id = msg.action.user.id
         end
         print('Checking invited user '..user_id)
-        if is_su_banned(user_id) or is_banned(user_id, chat_id) then
-          print('User is banned.')
+        if is_su_bned(user_id) or is_bned(user_id, chat_id) then
+          print('User is bned.')
           kick_user(user_id, chat_id)
         end
       end
@@ -218,16 +218,16 @@ do
       return msg
     end
 
-    -- BANNED USER TALKING
+    -- bNED USER TALKING
     if is_chat_msg(msg) then
-      if is_su_banned(user_id) then
-        print('suBanned user talking.')
-        suban_user(user_id, chat_id)
+      if is_su_bned(user_id) then
+        print('subned user talking.')
+        sub_user(user_id, chat_id)
         msg.text = ''
       end
-      if is_banned(user_id, chat_id) then
-        print('Banned user talking.')
-        ban_user(user_id, chat_id)
+      if is_bned(user_id, chat_id) then
+        print('bned user talking.')
+        b_user(user_id, chat_id)
         msg.text = ''
       end
     end
@@ -287,7 +287,7 @@ do
           elseif string.match(matches[2], '^@.+$') then
             msgr = res_user(string.gsub(matches[2], '@', ''), resolve_username, {msg=msg, match=matches[1]})
           end
-        elseif matches[1] == 'ban' then
+        elseif matches[1] == 'b' then
           if msg.reply_id then
             msgr = get_message(msg.reply_id, action_by_reply, {msg=msg, match=matches[1]})
           elseif string.match(matches[2], '^%d+$') then
@@ -295,13 +295,13 @@ do
           elseif string.match(matches[2], '^@.+$') then
             msgr = res_user(string.gsub(matches[2], '@', ''), resolve_username, {msg=msg, match=matches[1]})
           end
-        elseif matches[1] == 'banlist' then
-          local text = 'Ban list for '..msg.to.title..' ['..msg.to.id..']:\n\n'
-          for k,v in pairs(redis:keys('banned:'..msg.to.id..':*')) do
+        elseif matches[1] == 'blist' then
+          local text = 'b list for '..msg.to.title..' ['..msg.to.id..']:\n\n'
+          for k,v in pairs(redis:keys('bned:'..msg.to.id..':*')) do
             text = text..k..'. '..v..'\n'
           end
-          return string.gsub(text, 'banned:'..msg.to.id..':', '')
-        elseif matches[1] == 'unban' then
+          return string.gsub(text, 'bned:'..msg.to.id..':', '')
+        elseif matches[1] == 'unb' then
           if msg.reply_id then
             msgr = get_message(msg.reply_id, action_by_reply, {msg=msg, match=matches[1]})
           elseif string.match(matches[2], '^%d+$') then
@@ -310,7 +310,7 @@ do
             msgr = res_user(string.gsub(matches[2], '@', ''), resolve_username, {msg=msg, match=matches[1]})
           end
         end
-        if matches[1] == 'antiflood' then
+        if matches[1] == 'an' then
           local data = load_data(_config.moderation.data)
           local settings = data[tostring(msg.to.id)]['settings']
           if matches[2] == 'kick' then
@@ -320,12 +320,12 @@ do
             end
               return 'Anti flood protection already enabled.\nFlooder will be kicked.'
             end
-          if matches[2] == 'ban' then
-            if settings.anti_flood ~= 'ban' then
-              settings.anti_flood = 'ban'
+          if matches[2] == 'b' then
+            if settings.anti_flood ~= 'b' then
+              settings.anti_flood = 'b'
               save_data(_config.moderation.data, data)
             end
-              return 'Anti flood  protection already enabled.\nFlooder will be banned.'
+              return 'Anti flood  protection already enabled.\nFlooder will be bned.'
             end
           if matches[2] == 'disable' then
             if settings.anti_flood == 'no' then
@@ -360,7 +360,7 @@ do
         end
       end
       if is_admin(msg) then
-        if matches[1] == 'suban' then
+        if matches[1] == 'sub' then
           if msg.reply_id then
             msgr = get_message(msg.reply_id, action_by_reply, {msg=msg, match=matches[1]})
           elseif string.match(matches[2], '^%d+$') then
@@ -368,7 +368,7 @@ do
           elseif string.match(matches[2], '^@.+$') then
             msgr = res_user(string.gsub(matches[2], '@', ''), resolve_username, {msg=msg, match=matches[1]})
           end
-        elseif matches[1] == 'suunban' then
+        elseif matches[1] == 'suunb' then
           if msg.reply_id then
             msgr = get_message(msg.reply_id, action_by_reply, {msg=msg, match=matches[1]})
           elseif string.match(matches[2], '^%d+$') then
@@ -384,26 +384,26 @@ do
   end
 
   return {
-    description = "Plugin to manage bans, kicks and white/black lists.",
+    description = "Plugin to manage bs, kicks and white/black lists.",
     usage = {
       user = {
         ".kickme : Kick yourself out of this group."
       },
       admin = {
-        ".suban : If type in reply, will ban user globally.",
-        ".suban <user_id>/@<username> : Kick user_id/username from all chat and kicks it if joins again",
-        ".suunban : If type in reply, will unban user globally.",
-        ".suunban <user_id>/@<username> : Unban user_id/username globally."
+        ".sub : If type in reply, will b user globally.",
+        ".sub <user_id>/@<username> : Kick user_id/username from all chat and kicks it if joins again",
+        ".suunb : If type in reply, will unb user globally.",
+        ".suunb <user_id>/@<username> : Unb user_id/username globally."
       },
       moderator = {
-        ".antiflood kick : Enable flood protection. Flooder will be kicked.",
-        ".antiflood ban : Enable flood protection. Flooder will be banned.",
-        ".antiflood disable : Disable flood protection",
-        ".ban : If type in reply, will ban user from chat group.",
-        ".ban <user_id>/<@username>: Kick user from chat and kicks it if joins chat again",
-        ".banlist : List users banned from chat group.",
-        ".unban : If type in reply, will unban user from chat group.",
-        ".unban <user_id>/<@username>: Unban user",
+        ".an kick : Enable flood protection. Flooder will be kicked.",
+        ".an b : Enable flood protection. Flooder will be bned.",
+        ".an disable : Disable flood protection",
+        ".b : If type in reply, will b user from chat group.",
+        ".b <user_id>/<@username>: Kick user from chat and kicks it if joins chat again",
+        ".blist : List users bned from chat group.",
+        ".unb : If type in reply, will unb user from chat group.",
+        ".unb <user_id>/<@username>: Unb user",
         ".kick : If type in reply, will kick user from chat group.",
         ".kick <user_id>/<@username>: Kick user from chat group",
         ".whitelist chat: Allow everybody on current chat to use the bot when whitelist mode is enabled",
@@ -414,12 +414,12 @@ do
       },
     },
     patterns = {
-      "^.(antiflood) (.*)$",
-      "^.(ban) (.*)$",
-      "^.(ban)$",
-      "^.(banlist)$",
-      "^.(unban) (.*)$",
-      "^.(unban)$",
+      "^.(an) (.*)$",
+      "^.(b) (.*)$",
+      "^.(b)$",
+      "^.(blist)$",
+      "^.(unb) (.*)$",
+      "^.(unb)$",
       "^.(kick) (.+)$",
       "^.(kick)$",
       "^.(kickme)$",
@@ -430,10 +430,10 @@ do
       "^.(whitelist) (disable)$",
       "^.(whitelist) (enable)$",
       "^.(whitelist) (user) (%d+)$",
-      "^.(suban)$",
-      "^.(suban) (.*)$",
-      "^.(suunban)$",
-      "^.(suunban) (.*)$"
+      "^.(sub)$",
+      "^.(sub) (.*)$",
+      "^.(suunb)$",
+      "^.(suunb) (.*)$"
     },
     run = run,
     pre_process = pre_process
