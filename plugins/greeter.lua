@@ -18,8 +18,8 @@ do
     return redis:get('banned:'..chat_id..':'..user_id) or false
   end
 
-  local function is_super_banned(user_id)
-      return redis:get('superbanned:'..user_id) or false
+  local function is_su_banned(user_id)
+      return redis:get('subanned:'..user_id) or false
   end
 
   local function run(msg, matches)
@@ -74,7 +74,7 @@ do
           user_flags = msg.action.user.flags
         end
         -- do not greet (super)banned users or API bots.
-        if is_super_banned(user_id) or is_banned(user_id, msg.to.id) then
+        if is_su_banned(user_id) or is_banned(user_id, msg.to.id) then
           print 'Ignored. User is banned!'
           return nil
         end
@@ -113,14 +113,14 @@ do
     description = 'Sends a custom message when a user enters or leave a chat.',
     usage = {
       moderator = {
-        '!welcome group : Welcome message will shows in group.',
-        '!welcome pm : Welcome message will send to new member via PM.',
-        '!welcome disable : Disable welcome message.'
+        '.welcome group : Welcome message will shows in group.',
+        '.welcome pm : Welcome message will send to new member via PM.',
+        '.welcome disable : Disable welcome message.'
       },
     },
     patterns = {
-      "^!!tgservice (.+)$",
-      "^!(welcome) (.*)$"
+      "^.!tgservice (.+)$",
+      "^.(welcome) (.*)$"
     },
     run = run
   }
